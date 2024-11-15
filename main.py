@@ -7,6 +7,7 @@ from flask_ckeditor import CKEditor
 from wtforms.validators import DataRequired, URL
 from flask_ckeditor import CKEditorField
 import smtplib
+from twilio.rest import Client
 
 import os
 from dotenv import load_dotenv
@@ -22,6 +23,11 @@ class Message(FlaskForm):
 EMAIL_KEY=os.environ.get("EMAIL_KEY")
 PASSWORD_KEY=os.environ.get("PASSWORD_KEY")
 TO_MAIL_ADDRESS=os.environ.get("TO_MAIL_ADDRESS")
+
+account_sid = os.environ.get("account_sid")
+auth_token = os.environ.get("auth_token")
+num=os.environ.get("num")
+tonum=os.environ.get("tonum")
 
 app=Flask(__name__)
 FLASK_KEY=os.environ.get("FLASK_KEY")
@@ -59,15 +65,16 @@ def portfolio():
 def contact():
    message_form=Message()
    if message_form.validate_on_submit():
+
+    cilent=Client(account_sid,auth_token)
+    message=cilent.messages.create(
+        from_=f"{num}",
+        to=f"{tonum}",
+        body=f"Subject:Portfolio Message\n\nFrom:{message_form.name.data}\nMail:{message_form.email.data}\nMessage:{message_form.message.data}"
+        )
+    print(message.status)
     
-    with smtplib.SMTP("smtp.gmail.com") as connection:
-        connection.starttls()
-        connection.login(user=EMAIL_KEY,password=PASSWORD_KEY)
-        connection.sendmail(from_addr=EMAIL_KEY,
-                            to_addrs=TO_MAIL_ADDRESS,
-                            msg=f"Subject:Portfolio Message\n\nFrom:{message_form.name.data}\nMail:{message_form.email.data}\nMessage:{message_form.message.data}")
-        # return redirect(url_for('portfolio'))
-        return render_template('contact.html',sent=True)
+    return render_template('contact.html',sent=True)
     
    return render_template('contact.html',form=message_form)
    
