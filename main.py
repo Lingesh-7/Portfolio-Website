@@ -20,8 +20,8 @@ class Message(FlaskForm):
     submit=SubmitField("Send!")
 
 
-account_sid = os.environ.get("account_sid")
-auth_token = os.environ.get("auth_token")
+account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
+auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
 num=os.environ.get("num")
 tonum=os.environ.get("tonum")
 
